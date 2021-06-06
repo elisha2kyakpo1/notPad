@@ -35,7 +35,7 @@ saveData.addEventListener('click', () => {
 
 const renderBtn = document.querySelector('.btn-render');
 renderBtn.addEventListener('click', () => {
-  const resp = fetch(`https://apply.switchmaven.com/api/retrieve/name`, {
+  const resp = fetch(`https://apply.switchmaven.com/api/retrieve?elisha`, {
   method: 'GET',
   headers: {
     'Accept': 'application/json, text/plain, */*',
