@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
+  <title>Text Editor</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+    body {
+      font-family: sans-serif;
+    }
+
+    .main-content {
+      width: 500px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-50%);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19);
+    }
+
+    .text-editor-header {
+      background-color: #ecf0f1;
+      padding: 5px;
+    }
+    .text-editor-header .btn {
+      border: none;
+      outline: none;
+      background-color: transparent;
+      margin-right: 5px;
+      font-size: 1.2rem;
+    }
+
+    .content {
+      min-height: 200px;
+      border: 1px solid #ecf0f1;
+      border-top: 0px;
+      padding: 20px;
+    }
+
+    .content ul,
+    .content ol {
+      padding-left: 25px;
+    } 
+
+    .btn-submit,
+    .btn-render {
+      background-color: #16a34a;
+      padding: 3px 5px;
+      font-size: 18px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 600;
+      border-radius: 3px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .subBtn {
+      margin: 10px;
+    }
+
+    .name {
+      border: none;
+      padding: 5px;
+      font-size: 18px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="main-content">
+	
+    <div class="text-editor-header">
+      <button type="button" class="btn" data-element="bold">
+        <i class="fa fa-bold"></i>
+      </button>
+      
+      <button type="button" class="btn" data-element="italic">
+        <i class="fa fa-italic"></i>
+      </button>
+      
+      <button type="button" class="btn" data-element="underline">
+        <i class="fa fa-underline"></i>
+      </button>
+      
+      <button type="button" class="btn" data-element="insertUnorderedList">
+        <i class="fa fa-list-ul"></i>
+      </button>
+      
+      <button type="button" class="btn" data-element="insertOrderedList">
+        <i class="fa fa-list-ol"></i>
+      </button>
+      
+      <button type="button" class="btn" data-element="createLink">
+        <i class="fa fa-link"></i>
+      </button>
+      
+      <button type="button" class="btn" data-element="insertImage">
+        <i class="fa fa-image"></i>
+      </button>
+    </div> 
+    <form action="">
+      <input type="text" class="name" placeholder="Enter name">
+      <div class="content" id="data" contenteditable="true"></div>
+    </form>
+    
+    <div class="subBtn">
+      <button type="submit" class="btn-submit">Save</button>
+      <button class="btn-render">Load saved content</button>
+    </div>
+    
+  </div>
+  <script>
+    const elements = document.querySelectorAll('.btn');
+
+    elements.forEach(element => {
+      element.addEventListener('click', () => {
+        let command = element.dataset['element'];
+        
+        if (command == 'createLink' || command == 'insertImage') {
+          let url = prompt('Enter the link here:', 'http://');
+          document.execCommand(command, false, url);
+        } else {
+          document.execCommand(command, false, '');
+        }
+      });
+    });
+
+    const myData = document.getElementById('data');
+    let contentData = myData.innerHTML;
+    const nameInput = document.getElementsByClassName('name');
+    let name = nameInput.value;
+    const saveData = document.querySelector('.btn-submit');
+
+    saveData.addEventListener('click', () => {
+      const resp = fetch('https://apply.switchmaven.com/api/save', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, contentData })
+      }).then(resp => resp.json)
+      name = '';
+      contentData.value = '';
+      console.log(resp);
+    })
+
+    const renderBtn = document.querySelector('.btn-render');
+    renderBtn.addEventListener('click', () => {
+      const resp = fetch(`https://apply.switchmaven.com/api/retrieve/name`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      })
+
+      contentData = resp.length - 1;
+      console.log(resp);
+    
+    })
+
+  </script>
+</body>
+</html>
